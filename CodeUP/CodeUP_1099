@@ -1,0 +1,60 @@
+#include<cstdio>
+
+const int ARRAY_SIZE = 10+1;
+const int s_x = 2, s_y = 2;
+const int CHECKED = 9;
+
+void getNext(const int table[ARRAY_SIZE][ARRAY_SIZE], int* p_x, int* p_y){
+	int x = *p_x, y = *p_y;
+	if (table[x][y + 1] != 1) {
+		(*p_y)++;
+	}
+	else if (table[x + 1][y] != 1) {
+		(*p_x)++;
+	}
+}
+
+void findFood(int table[ARRAY_SIZE][ARRAY_SIZE]) {
+	int x = s_x, y = s_y;
+	/*table[x][y] = CHECKED;*/
+	while (true) {
+		if (table[x][y] == 0) {
+			table[x][y] = CHECKED;
+			getNext(table, &x, &y);
+			//printf("%d %d\n", x, y);
+			continue;
+		}
+		else if (table[x][y] == 2) {
+			table[x][y] = CHECKED;
+			break;
+		}
+		else {
+			break;
+		}
+	}
+}
+
+
+int main() {
+
+	int table[ARRAY_SIZE][ARRAY_SIZE] = {};
+	
+	// init
+	for (int row = 1; row < ARRAY_SIZE; row++) {
+		for (int col = 1; col < ARRAY_SIZE; col++) {
+			scanf("%d", &table[row][col]);
+		}
+	}
+
+	findFood(table);
+
+	for (int row = 1; row < ARRAY_SIZE; row++) {
+		for (int col = 1; col < ARRAY_SIZE; col++) {
+			printf("%d ", table[row][col]);
+		}
+		printf("\n");
+	}
+
+
+	return 0;
+}
