@@ -1,0 +1,81 @@
+#include<cstdio>
+#include<iostream>
+#include<vector>
+#include<string>
+#include<algorithm>
+using namespace std;
+
+int k;
+string max_str = "-1";
+string min_str = "9999999999";
+
+string str = "";
+vector<char> op;
+vector<bool> visited = vector<bool>(10, false);
+
+// current : 현재 값 넣을 인덱스
+// max 값
+void dfs(int prev, int current) {
+	if (current == k + 1) {
+		max_str = max(str, max_str);
+		min_str = min(str, min_str);
+		return;
+	}
+
+	if (op[current - 1] == '>') {
+		// 이전의 온 값보다 작은 값 대입
+		for (int i = prev-1; i >= 0; i--) {
+			if (visited[i] == false) {
+				visited[i] = true;
+				str += char(i + '0');
+				dfs(i, current + 1);
+				visited[i] = false;
+				str.erase(current, 1); // str 하나 지워주기
+			}
+		}
+	}
+
+	else if (op[current - 1] == '<') {
+		for (int i = 9; i > prev; i--) {
+			if (visited[i] == false) {
+				visited[i] = true;
+				str += char(i + '0');
+				dfs(i, current + 1);
+				visited[i] = false;
+				str.erase(current, 1); // str 하나 지워주기
+			}
+		}
+	}
+
+	return;
+}
+
+void process(int k, vector<char> op) {
+	
+	for (int i = 9; i >= 0; i--) {
+		visited[i] = true;
+		str += char(i + '0');
+		dfs(i, 1);
+		visited[i] = false;
+		str.erase(0, 1); // str 하나 지워주기
+	}
+}
+
+
+int main() {
+
+	scanf("%d", &k);
+
+	op = vector<char>(k);
+
+	for (int i = 0; i < k; i++) {
+		scanf(" %c", &op[i]);
+	}
+
+
+	process(k, op);
+
+	printf("%s\n%s", max_str.c_str(), min_str.c_str());
+	
+	return 0;
+}
