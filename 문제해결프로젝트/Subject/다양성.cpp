@@ -3,18 +3,18 @@
 
 using namespace std;
 
-// ìœ ë‹ˆí¬í•œ í™”ë³´ ìˆ˜ êµ¬í•˜ëŠ” í•¨ìˆ˜
+// À¯´ÏÅ©ÇÑ È­º¸ ¼ö ±¸ÇÏ´Â ÇÔ¼ö
 int getElementTypeCount(int pic_data[], int num){
 	int countType = num, pre_pic_data = pic_data[0];
 
 
 	for (int i = 1; i < num; i++){
 	
-		// ì´ì „ í™”ë³´ ë²ˆí˜¸ì™€ ê°™ë‹¤ë©´ ì´ ê°œìˆ˜ ê°ì†Œ
+		// ÀÌÀü È­º¸ ¹øÈ£¿Í °°´Ù¸é ÃÑ °³¼ö °¨¼Ò
 		if (pre_pic_data == pic_data[i])
 			countType--;
 
-		// ì´ì „ í™”ë³´ ë²ˆí˜¸ì™€ ë‹¤ë¥´ë‹¤ë©´ ë³€ìˆ˜ êµì²´
+		// ÀÌÀü È­º¸ ¹øÈ£¿Í ´Ù¸£´Ù¸é º¯¼ö ±³Ã¼
 		else
 			pre_pic_data = pic_data[i];
 	}
