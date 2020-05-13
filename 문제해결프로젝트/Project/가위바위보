@@ -1,0 +1,236 @@
+#include<stdio.h>
+#include<iostream>
+#include<string>
+#include<time.h>
+
+using namespace std;
+
+#define ROCK 1
+#define SCISSORS 0
+#define PAPER -1
+
+#define WIN 1
+#define DRAW 0
+#define LOSE -1
+
+
+class Game{
+private:
+	int value;  // 가위, 바위, 보 중 값을 가짐
+	static bool rock, scissors, paper; // draw가 되는지 판별을 위한 변수
+	int iswin; // 이전 값과 비교하여, 승무패 중 값을 가짐
+public:
+	// 생성자
+	Game(){
+		iswin = DRAW; // 무승부로 default
+	}
+
+	// 생성자
+	/*Game(const string str){
+	if (str.compare("가위") == 0)
+	this->value = SCISSORS;
+	else if (str.compare("바위") == 0)
+	this->value = ROCK;
+	else
+	this->value = PAPER;
+	}*/
+
+	// 가위, 바위, 보에 대해 int형으로 값을 변경하여 넣어주는 함수
+	void setValue(const string str){
+		if (str.compare("가위") == 0){
+			this->value = SCISSORS;
+			if (!scissors)
+				scissors = true;
+		}
+		else if (str.compare("바위") == 0)
+		{
+			this->value = ROCK;
+			if (!rock)
+				rock = true;
+		}
+		else{
+			this->value = PAPER;
+			if (!paper)
+				paper = true;
+		}
+	}
+
+	// 값 리턴
+	int getValue()
+	{
+		return this->value;
+	}
+
+	// 승무패 설정
+	void setIsWin(int win){
+		this->iswin = win;
+	}
+
+	// 승무패 리턴
+	int getIsWin(){
+		return this->iswin;
+	}
+
+
+	// 가위, 바위, 보 모두 나왔을 경우와 한가지 값으로만 나온 경우 true 리턴
+	// 2 가지 값으로 나온 경우, false 리턴
+	bool isDraw(){
+		if (rock && paper && scissors)
+			return true;
+		else if ((!rock && !paper) || (!rock && !scissors) || (!scissors && !paper))
+			return true;
+		else
+			return false;
+	}
+
+	// int형으로 바꾼 가위, 바위, 보 값을 비교하여 승무패 값 리턴
+	int checkWin(int a, int b){
+		if (a == ROCK && b == PAPER)
+			return LOSE;
+		else if (a == PAPER && b == ROCK)
+			return WIN;
+		else if (a == b)
+			return DRAW;
+		else if (a > b)
+			return WIN;
+		else
+			return LOSE;
+	}
+
+	// 'checkWin'함수를 이용해서 연산자 오버로딩
+	bool operator>(const Game &o){
+		if (this->checkWin(this->value, o.value) == 1)
+			return true;
+		else
+			return false;
+	}
+
+	// 'checkWin'함수를 이용해서 연산자 오버로딩
+	bool operator<(const Game &o){
+		if (this->checkWin(this->value, o.value) == -1)
+			return true;
+		else
+			return false;
+	}
+
+	// 'checkWin'함수를 이용해서 연산자 오버로딩
+	bool operator==(const Game&o){
+		if (this->checkWin(this->value, o.value) == 0)
+			return true;
+		else
+			return false;
+	}
+
+};
+
+// 모든 Game 클래스 변수에 대해 공유하는 값 초기화
+bool Game::rock = false, Game::scissors = false, Game::paper = false;
+
+
+// b 기준
+/**
+ * @param a		이전 값(가위, 바위, 보)
+ * @param b		현재 값(가위, 바위, 보)
+ * @return LOSE	현재 값이 질 경우
+ * @return DRAW	무승부
+ * @return WIN	현재 값이 이길 경우
+ *
+ */
+int playGame(Game a, Game b){
+	if (a>b)
+		return LOSE;
+	else if (a == b)
+		return DRAW;
+	else
+		return WIN;
+}
+
+int main(){
+	int num, res; // num : 게임 참여 학생 숫자, res : 현재 값과 이전 값과의 게임 결과 ex)승,무,패
+	Game* game_state; // 가위, 바위, 보 값을 저장하는 클래스배열의 포인터
+	string answer; // 학생들의 가위, 바위, 보 값을 저장하는 string 변수
+
+	// 출력 시, 이전의 값의 결과(승,무,패)가 무승부임을 판별하기 위한 bool 변수
+	bool isdraw = false;
+
+
+	cin >> num;
+	game_state = new Game[num]; // 학생 수 만큼 동적할당
+
+	cin >> answer;
+
+	clock_t start = clock();
+
+	game_state[0].setValue(answer);
+
+	// 값을 저장하고, 값 비교를 통해 결과를 저장하는 for문
+	for (int i = 1; i < num; i++){
+		cin >> answer;
+		game_state[i].setValue(answer); // 값 저장
+
+		res = playGame(game_state[i - 1], game_state[i]); // 이전 값과의 비교를 통한 결과 값
+
+		// 그 이전값의 결과 => 현재 값의 결과로 동일하게 저장
+		// ex) 가위 가위 가위 바위 가위 -> DRAW DRAW DRAW WIN LOSE 이 될 수 있음
+		if (res == DRAW) 
+			game_state[i].setIsWin(game_state[i - 1].getIsWin());
+		else // 결과 저장
+			game_state[i].setIsWin(res);
+
+		if (i == 1) // 0번째는 결과가 'draw'로 기본값으로 저장되어 있어, 1번째 값과 비교하여 결과 저장
+		{ 
+			game_state[i - 1].setIsWin(playGame(game_state[i], game_state[i - 1]));
+		}
+
+	}
+
+
+	// 가위, 바위, 보 값이 모두 나오거나 // 1가지 값만 나왔다면 "draw" 출력
+	if (game_state[0].isDraw()){
+		cout << "draw";
+	}
+	else // draw가 아닐경우,
+	{
+		// 승무패 결과 값을 가지고 출력을 위한 for문
+		for (int i = 0; i < num; i++){
+			res = game_state[i].getIsWin(); // 승무패 값을 가져옴
+
+			// 이전 값과의 결과가 무승부라면, 결과가 나올 때 까지 보류
+			if (res == DRAW)
+			{
+				isdraw = true;
+				continue;
+			}
+
+			// 이전 값과의 결과가 졌고, 이전 값이 무승부를 가지고 있다면
+			//		-> 처음부터 ~ 이전 값까지는 동일한 값 + 승리기 때문에, 모두 출력
+			// isdraw를 false로 함으로써, 이전의 값은 draw가 아님을 증명
+			else if (res == LOSE)
+			{
+				if (isdraw){
+					for (int j = 0; j < i; j++){
+						cout << j << " ";
+					}
+					isdraw = false;
+				}
+			}
+
+			// 현재 값의 결과가 승리 -> 이전 값이 무승부든 아니든, 모두 LOSE임을 보임
+			// isdraw를 false로 함으로써, 이전의 값은 draw가 아님을 증명
+			else
+			{
+				cout << i << " ";
+				isdraw = false;
+			}
+			
+		}
+	}
+	cout << endl;
+
+
+	delete[] game_state;
+	clock_t end = clock();
+	printf("Time : %lf\n", (double)(end - start) / CLOCKS_PER_SEC);
+
+	return 0;
+}
